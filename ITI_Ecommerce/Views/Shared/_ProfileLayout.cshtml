@@ -1,0 +1,24 @@
+﻿@{
+    Layout = "_Layout";
+}
+<style>
+    #scroll-order::-webkit-scrollbar {
+        display: none;
+    }
+
+    #scroll-order {
+        overflow-y: auto;
+        height: 620px;
+    }
+</style>
+<div>
+    <div class="row">
+        <div class="col-md-3" style="display:flex;justify-content:center;align-items:center;">
+            <partial name="_ProfileNav"/>
+        </div>
+        <div id="scroll-order" class="col-md-9">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+

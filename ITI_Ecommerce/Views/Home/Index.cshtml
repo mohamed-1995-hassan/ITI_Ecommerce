@@ -1,0 +1,145 @@
+﻿@using ITI_Ecommerce.ViewModels
+@model BookDisplayModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="my-2">
+    <form action="/Home/Index" class="row row-cols-lg-auto g-3 align-items-center">
+      
+
+      <div class="col-12">
+        <label asp-for="CategoryId" class="visually-hidden" for="inlineFormSelectPref">Categories</label>
+        <select class="form-select" id="categoryId" name="categoryId">
+            <option selected>Choose...</option>
+            @foreach(var category in Model.Categories){
+                <option selected="@(category.Id == Model.CategoryId)" value="@category.Id">@category.CategoryName</option>
+            }
+        </select>
+      </div>
+
+      <div class="col-12">
+            <label asp-for="STerm" class="visually-hidden">Search By Title</label>
+        <div class="input-group">
+          <div class="input-group-text"></div>
+          <input type="text" value="@Model.STerm" class="form-control" id="sterm" name="sterm" placeholder="Search By Title">
+        </div>
+      </div> 
+
+      <div class="col-12">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a href="/Home/Index" class="btn btn-dark">Reset</a>
+      </div>
+    </form>
+</div>
+<div class="w-100 mt-4 d-flex flex-wrap">
+    @foreach (var book in Model.Books)
+    {
+        <div class="card mx-3 mb-4" style="width: 18rem;">
+            @if (string.IsNullOrEmpty(book.Image))
+            {
+                <img style="width:100%;height:180px;" src="/images/noImage.png" class="card-img-top" />
+            }
+            else
+            {
+                <img style="width:100%;height:180px;" src="/images/@book.Image" class="card-img-top" />
+            }
+            <div class="card-body">
+                <h5 class="card-title">@book.BookName</h5>
+                <p class="card-text">Category:@book.CategoryName</p>
+                <p>Auther:@book.AutherName</p>
+                <p>Price:@book.Price</p>
+                @* <p>Quantity:@book.Quantity</p> *@
+
+                <div style="display:flex;justify-content: center; align-items: center">
+
+                    <div class="card m-1 pt-0 pb-0 px-2 py-2" style="cursor:pointer;">
+                        <i class="bi bi-eye-fill" style="font-size:30px;color:#1f5b83"></i>
+                    </div>
+                    <div onclick="manageFavourite.bind(this)(@book.Id, @book.IsFavourite.ToString().ToLower())" class="card m-1 pt-0 pb-0 px-2 py-2" style="cursor:pointer;">
+
+                        @if (book.IsFavourite)
+                        {
+
+                            <i class="bi bi-heart-fill" style="font-size: 30px;color:red"></i>
+
+                        }
+                        else{
+                            <span id="heartIcon" class="badge text-bg-info" style="position: absolute; top: 25%; right: 15%; transform: translate(50%, -50%);">+</span>
+                            <i class="bi bi-heart" style="font-size: 30px;color:red"></i>
+                        }
+                    </div>
+
+                    @if (book.Quantity > 0)
+                    {
+
+                        <div class="card m-1 pt-0 pb-0 px-2 py-2" style="cursor:pointer;">
+                            <i class="bi bi-cart" onclick="add(@book.Id)" style="font-size:30px;color:#1f5b83"></i>
+                        </div>
+                       
+                    }
+                    else
+                    {
+                        <span style="border: 1px solid;padding: 5px 8px;color: red;border-radius: 5px;" class="m-1">Out of stock</span>
+                    }
+                </div>
+                
+            </div>
+        </div>
+    }
+</div>
+
+
+@section Scripts{
+    <script>
+        async function add(bookId){
+
+            if (@User?.Identity?.IsAuthenticated.ToString().ToLower() == false) {
+                window.location.href = '/identity/Account/Login'
+            }
+            try{
+                var response = await fetch(`/Cart/AddItem?bookId=${bookId}`);
+                if (response.status == 200) {
+                    var result = await response.json();
+                    var cardItemElement = document.getElementById("cardCount");
+                    cardItemElement.innerHTML = result;
+                    window.location.href = "#cardCount"
+                }
+                
+            }catch(err){
+                console.log(err);
+            }
+        }
+
+
+
+        async function manageFavourite(bookId, wishListId) {
+            let icon = '';
+            if (@User?.Identity?.IsAuthenticated.ToString().ToLower() == false) {
+                window.location.href = '/identity/Account/Login'
+            }
+            try{
+                
+                var heartCount = document.getElementById("heartCount");
+                var response = await fetch(`/WishList/ManageWishList?bookId=${bookId}`);
+                if (response.status == 200) {
+                    var result = await response.json();
+                    console.log(result);
+                    if(result == true){
+                        heartCount.innerHTML = Number(heartCount.innerHTML) + 1;
+                        $(this).html(`<i class="bi bi-heart-fill" style="font-size: 30px;color:red"></i>`)
+
+                    }
+                    else{
+                        heartCount.innerHTML = Number(heartCount.innerHTML) - 1;
+                        $(this).html(`<span id="heartIcon" class="badge text-bg-info" style="position: absolute; top: 25%; right: 15%; transform: translate(50%, -50%);">+</span><i class="bi bi-heart" style="font-size: 30px;color:red"></i>`)
+                    }
+                    window.location.href = "#heartCount"
+                }
+                
+            }catch(err){
+                console.log(err);
+            }
+
+        }
+    </script>
+}

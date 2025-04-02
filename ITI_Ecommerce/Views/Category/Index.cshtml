@@ -1,0 +1,27 @@
+﻿﻿
+@model IEnumerable<Category>
+@{
+    Layout = "_AdminLayout";
+}
+
+<h2>Genres</h2>
+
+<a asp-action="AddCategory" asp-controller="Category" class="btn btn-primary">Add More</a>
+
+<table class="table table-striped my-2">
+    <tr>
+        <th>Category</th>
+        <th>Action</th>
+    </tr>
+
+    @foreach(var genre in Model)
+    {
+        <tr>
+            <td>@genre.CategoryName</td>
+            <td>
+                <a asp-action="UpdateCategory" asp-controller="Category" asp-route-id="@genre.Id" class="btn btn-success">Edit</a>
+                <a asp-action="DeleteCategory" asp-controller="Category" asp-route-id="@genre.Id" class="btn btn-danger" onclick="return window.confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+    }
+</table>

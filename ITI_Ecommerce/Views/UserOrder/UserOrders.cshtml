@@ -1,0 +1,162 @@
+﻿@using ITI_Ecommerce.Models﻿
+@model IEnumerable<Order>
+@{
+    ViewData["Title"] = "GetUserCart";
+    Layout = "_ProfileLayout";
+}
+
+<style>
+    /* Card hover effect */
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* Order Item Enhancements */
+    .order-item {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .order-item-img img {
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    /* Book Title */
+    .order-item-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    /* Author Name */
+    .order-item-author {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    /* Genre and Description */
+    .order-item-genre, .order-item-description {
+        font-size: 14px;
+        color: #495057;
+        margin-top: 5px;
+    }
+
+    /* Price and Quantity */
+    .order-item-price p {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    /* Action Buttons */
+    .btn-outline-info, .btn-outline-success, .btn-outline-danger {
+        width: 30%;
+    }
+
+    /* Custom Borders */
+    hr {
+        border-top: 1px solid #ddd;
+        margin-top: 15px;
+    }
+
+    /* Hover Effect for Book Image */
+    .order-item-img img:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease-in-out;
+    }
+</style>
+
+
+<div style="width: 100%;" class="mt-4">
+    @if (Model != null && Model.Count() > 0)
+    {
+        <div class="row">
+            @foreach (var order in Model.Select((order, index) => new { order, index }))
+            {
+                <div class="col-md-12 mb-4">
+                    <!-- Card for each order -->
+                    <div class="card shadow-sm border-light rounded-lg">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                            <div>
+                                <h5 class="mb-0">Order Date: @order.order.CreatedAt.ToString("dd-MM-yyyy")</h5>
+                                <p class="mb-0">
+                                    <span class="badge rounded-pill @GetStatusClass(order.order.OrderStatus.StatusName)">@order.order.OrderStatus.StatusName</span>
+                                </p>
+                            </div>
+                            <h5 class="mb-0">
+                                Total: ₹@(order.order.OrderDetails != null && order.order.OrderDetails.Count > 0
+                            ? order.order.OrderDetails.Select(item => item.Book.Price * item.Quantity).Sum() : 0)
+                            </h5>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- Enhanced Order Items -->
+                            @foreach (var item in order.order.OrderDetails)
+                            {
+                                <div class="order-item mb-4">
+                                    <div class="d-flex justify-content-between">
+                                        <!-- Book Info -->
+                                        <div class="d-flex">
+                                            <div class="order-item-img">
+                                                @if (string.IsNullOrEmpty(item.Book.Image))
+                                                {
+                                                    <img src="/images/noImage.png" class="img-fluid" style="width:120px; height:160px;" />
+                                                }
+                                                else
+                                                {
+                                                    <img src="/images/@item.Book.Image" class="img-fluid" style="width:120px; height:160px;" />
+                                                }
+                                            </div>
+                                            <div class="order-item-details ms-3">
+                                                <h5 class="order-item-title">@item.Book.BookName</h5>
+                                                <p class="order-item-author text-muted">by @item.Book.AutherName</p>
+                                                <p class="order-item-genre">Genre: @item.Book.Category.CategoryName</p>
+                                            </div>
+                                        </div>
+                                        <!-- Pricing -->
+                                        <div class="order-item-price text-end">
+                                            <p><strong>Price:</strong> ₹@item.Book.Price</p>
+                                            <p><strong>Quantity:</strong> @item.Quantity</p>
+                                            <p><strong>Total:</strong> ₹@(@item.Book.Price * item.Quantity)</p>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <h5 class="text-center text-muted">No orders found</h5>
+    }
+</div>
+
+
+@functions {
+    public string GetStatusClass(string status)
+    {
+        switch (status.ToLower())
+        {
+            case "pending":
+                return "bg-warning text-dark"; // Yellow for Pending
+            case "shipped":
+                return "bg-primary text-white"; // Blue for Shipped
+            case "delivered":
+                return "bg-success text-white"; // Green for Delivered
+            case "canceled":
+                return "bg-danger text-white"; // Red for Canceled
+            default:
+                return "bg-secondary text-white"; // Default gray
+        }
+    }
+}
+
+
+
+

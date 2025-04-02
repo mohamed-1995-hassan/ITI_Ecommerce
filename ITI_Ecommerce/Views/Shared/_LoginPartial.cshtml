@@ -1,0 +1,48 @@
+﻿@using ITI_Ecommerce.Constants
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+<ul class="navbar-nav" style="display: flex; justify-content: center; align-items: center">
+    <li class="nav-item mx-2">
+        <a class="nav-link" href="/WishList/GetUserWishList" style="position: relative;">
+            <span id="heartCount" class="badge text-bg-info" style="position: absolute; top: 25%; right: 15%; transform: translate(50%, -50%);">0</span>
+            <i class="bi bi-heart" style="height:100px; font-size: 30px; color:red"></i>
+        </a>
+    </li>
+    
+    <li class ="nav-item mx-2">
+        <a class="nav-link" href="/Cart/GetUserCart" style="position: relative;">
+            <span id="cardCount" class="badge text-bg-info" style="position: absolute; top: 25%; right: 15%; transform: translate(50%, -50%);">0</span>
+            <i class="bi bi-cart" style="height:100px; font-size: 30px;"></i>
+        </a>
+    </li>
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item">
+            <a class="nav-link" asp-controller="UserOrder" asp-action="UserOrders" title="Manage">
+                Hello <span id="username">@User.Identity?.Name!</span>
+                @if (User.IsInRole(Roles.Admin.ToString()))
+                {
+                    <span>(Admin)</span>
+                }
+            </a>
+    </li>
+    <li class="nav-item">
+        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+        </form>
+    </li>
+}
+else
+{
+    
+     
+    <li class="nav-item">
+        <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    </li>
+}
+</ul>

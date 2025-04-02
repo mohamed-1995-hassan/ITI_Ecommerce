@@ -1,0 +1,23 @@
+﻿@using ITI_Ecommerce.ViewModels
+
+@model CategoryDto
+@{
+    ViewData["Title"] = "AddCategory";
+    Layout = "_AdminLayout";
+}
+<div style="width:50%">
+<h2> Add Category </h2>
+    <a asp-action="Index" asp-controller="Category" class="btn btn-primary">Back</a>
+<form asp-action="AddGenre">
+   <div class="my-2">
+      <label>Genre</label>
+      <input type="text" class="form-control" asp-for="CategoryName" />
+      <span asp-validation-for="CategoryName" class="text-danger"></span>
+   </div>
+
+   <div class="my-2">
+      <button type="submit" class="btn btn-info">Add</button>
+   </div>
+</form>
+</div>
+
