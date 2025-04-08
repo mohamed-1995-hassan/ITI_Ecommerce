@@ -1,0 +1,41 @@
+﻿@using ITI_Ecommerce.ViewModels
+
+@model CouponDto
+
+@{
+    ViewData["Title"] = "UpdateCategory";
+    Layout = "_AdminLayout";
+}
+@* @Html.ValidationSummary() *@
+<div style="width:50%">
+    <h2> Update Category </h2>
+    <a asp-action="Index" asp-controller="Coupon" class="btn btn-primary">Back</a>
+    <form asp-action="UpdateCoupon">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="my-2">
+            <label>Code</label>
+            <input type="text" class="form-control" asp-for="Code" />
+            <span asp-validation-for="Code" class="text-danger"></span>
+        </div>
+        <div class="my-2">
+            <label>Maximum Time Used</label>
+            <input type="number" class="form-control" asp-for="MaximumTimeUsed" />
+            <span asp-validation-for="MaximumTimeUsed" class="text-danger"></span>
+        </div>
+        <div class="my-2">
+            <label>DisCount Amount</label>
+            <input type="number" class="form-control" asp-for="DisCountAmount" />
+            <span asp-validation-for="DisCountAmount" class="text-danger"></span>
+        </div>
+        <div class="my-2">
+            <label>Expiry Date</label>
+            <input type="date" asp-for="ExpiryDate" style="width: 200px;" class="form-control" />
+            <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+        </div>
+
+        <div class="my-2">
+            <button type="submit" class="btn btn-info">Update</button>
+        </div>
+    </form>
+</div>

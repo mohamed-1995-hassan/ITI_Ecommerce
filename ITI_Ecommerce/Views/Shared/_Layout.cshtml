@@ -47,7 +47,6 @@
 
     <script>
         loadCardCount();
-        GetWishListItemCount();
         async function loadCardCount(){
             try{
                 
@@ -64,24 +63,6 @@
                 console.log(err);
             }
         }
-
-        async function GetWishListItemCount(){
-            try{
-
-
-            var response = await fetch(`/WishList/GetWishListItemCount`);
-                if (response.status == 200) {
-                    var result = await response.json();
-                    console.log(result);
-                    var cardItemElement = document.getElementById("heartCount");
-                    cardItemElement.innerHTML = result;
-                }
-                
-            }catch(err){
-                console.log(err);
-            }
-        }
-
     </script>
 </html>
 

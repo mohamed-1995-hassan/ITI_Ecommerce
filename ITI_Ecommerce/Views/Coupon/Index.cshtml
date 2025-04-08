@@ -1,0 +1,32 @@
+﻿@model IEnumerable<Coupon>
+@{
+    Layout = "_AdminLayout";
+}
+
+<h2>Coupons</h2>
+
+<a asp-action="AddCoupon" asp-controller="Coupon" class="btn btn-primary">Add More</a>
+
+<table class="table table-striped my-2">
+    <tr>
+        <th>Code</th>
+        <th>Maximum Time Used</th>
+        <th>Expiry Date</th>
+        <th>DisCount Amount</th>
+        <th>Action</th>
+    </tr>
+
+    @foreach (var coupon in Model)
+    {
+        <tr>
+            <td>@coupon.Code</td>
+            <td>@coupon.MaximumTimeUsed</td>
+            <td>@coupon.ExpiryDate</td>
+            <td>@coupon.DisCountAmount</td>
+            <td>
+                <a asp-action="UpdateCoupon" asp-controller="Coupon" asp-route-id="@coupon.Id" class="btn btn-success">Edit</a>
+                <a asp-action="DeleteCoupon" asp-controller="Coupon" asp-route-id="@coupon.Id" class="btn btn-danger" onclick="return window.confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+    }
+</table>

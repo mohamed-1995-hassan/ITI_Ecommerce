@@ -1,71 +1,284 @@
 ﻿@using ITI_Ecommerce.Models﻿
 @model ShoppingCart
-@{
-    ViewData["Title"] = "GetUserCart";
-}
 
-<div style="width:90%;margin:auto" class="mt-2">
-    @if (Model != null && Model.CartDetails != null && Model.CartDetails.Count > 0)
-    {
-        <h5>My Cart</h5>
-
-        <table class="table table-striped">
-            <tr>
-                <th>Book</th>
-                <th>Image</th>
-                <th>Genre</th>
-                <th>Unit Price(INR)</th>
-                <th>Total Price</th>
-                <th>Action</th>
-            </tr>
-            @foreach (var item in Model.CartDetails)
-            {
-                <tr>
-                    <td>@item.Book.BookName</td>
-                    <td>
-                        @if (string.IsNullOrEmpty(item.Book.Image))
-                        {
-                            <img src="/images/noImage.png" style="width:80px;height:100px" />
-                        }
-                        else
-                        {
-                            <img src="/images/@item.Book.Image" style="width:80px;height:100px" />
-                        }
-                    </td>
-                    <td>@item.Book.Category.CategoryName</td>
-                    <td>@item.Book.Price X @item.Quantity</td>
-                    <td>@(item.Book.Price * item.Quantity)</td>
-                    <td>
-
-                        @* Increase Quantity button should be invisible if not enough stock*@
-                        @if (item.Quantity < item.Book.Stock.Quantity)
-                        {
-                            <a class="btn btn-info" href="/Cart/AddItem?bookId=@item.BookId&&redirect=1">+</a>
-                        }
-                        else
-                        {
-                            <span style="border: 1px solid;padding: 8px 8px;color: red;border-radius: 5px;margin-right:4px">Out of stock </span>
-                        }
-                        @* Decrement button *@
-                        <a class="btn btn-info" href="/cart/removeitem?bookid=@item.BookId">-</a>
-                    </td>
-                </tr>
-            }
-        </table>
-
-        <div class="my-2">
-            <h5>Total(INR): </h5>
-            @(Model.CartDetails.Select(item => item.Book.Price * item.Quantity).Sum())
-        </div>
-
-        <div class="my-2">
-            <a class="btn btn-primary" href="/Cart/Checkout">Checkout</a>
-        </div>
-
+<style>
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease-in-out;
     }
-    else
-    {
-        <h5>Cart is empty</h5>
+
+    /* Order Item Enhancements */
+    .order-item {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
     }
+
+    .order-item-img img {
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    /* Book Title */
+    .order-item-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    /* Author Name */
+    .order-item-author {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    /* Genre and Description */
+    .order-item-genre {
+        font-size: 14px;
+        color: #495057;
+        margin-top: 3px;
+    }
+
+    /* Price and Quantity */
+    .order-item-price p {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    /* Action Buttons */
+    .btn-outline-info, .btn-outline-danger {
+        width: 20%;
+        margin-right: 5px;
+        font-weight:bold;
+    }
+
+    /* Custom Borders */
+    hr {
+        border-top: 1px solid #ddd;
+        margin-top: 15px;
+    }
+
+    /* Hover Effect for Book Image */
+    .order-item-img img:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    /* Button Adjustments */
+    .btn-outline-info, .btn-outline-danger {
+        font-size: 14px;
+    }
+
+
+    .checkout-card {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        font-size: 16px;
+        height: 300px;
+    }
+
+    .discount{
+        height:250px;
+        margin-top:20px;
+        align-items:center;
+    }
+
+        .checkout-card h2 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 20px;
+        }
+
+    .item, .subtotal, .tax, .total {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px 0;
+    }
+
+    .subtotal, .tax, .total {
+        font-weight: bold;
+    }
+
+    .checkout-btn {
+        display: inline-block; /* To make it behave like a button */
+        width: 100%;
+        padding: 10px;
+        background-color: #2c3e50;
+        color: white;
+        text-align: center; /* Ensures the text is centered */
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        text-decoration: none; /* Removes underline from the link */
+    }
+
+        .checkout-btn:hover {
+            background-color: #45a049;
+        }
+
+    .badge {
+        display: inline-flex;
+        align-items: center; /* Ensures text and close icon are vertically aligned */
+        background-color: gray;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .close-icon {
+        margin-left: 8px; /* Space between the text and the close button */
+        cursor: pointer;
+        color: red;
+        background-color: white; /* Red background for the circle */
+        border-radius: 50%; /* Makes the button round */
+        width: 15px; /* Width of the circle */
+        height: 15px; /* Height of the circle */
+        display: flex;
+        align-items: center; /* Vertically center the "X" */
+        justify-content: center; /* Horizontally center the "X" */
+        font-size: 12px; /* Size of the "X" */
+    }
+
+        .close-icon:hover {
+            background-color: red; /* Darker red on hover */
+            color:white;
+        }
+
+</style>
+
+<div class="row">
+    <div style="width:60%;margin:auto" class="mt-5 col-8">
+        @if (Model != null && Model.CartDetails != null && Model.CartDetails.Count > 0)
+        {
+            <div class="row">
+                @foreach (var item in Model.CartDetails)
+                {
+                    <div class="col-md-12 mb-1">
+                        <!-- Card for each cart item -->
+                        <div class="card shadow-sm border-light rounded-lg">
+                            <div class="card-body">
+                                
+                                    <!-- Book Info -->
+                                <div class="row">
+                                    <div class="order-item-img col-2">
+                                        @if (string.IsNullOrEmpty(item.Book.Image))
+                                        {
+                                            <img src="/images/noImage.png" class="img-fluid" style="width:60px; height:60px;" />
+                                        }
+                                        else
+                                        {
+                                            <img src="/images/@item.Book.Image" class="img-fluid" style="width:60px; height:60px;" />
+                                        }
+                                    </div>
+                                    <div class="order-item-details ms-3 col-3">
+                                        <h5 class="order-item-title">@item.Book.BookName</h5>
+                                        <p class="order-item-genre">@item.Book.Category.CategoryName</p>
+                                    </div>
+                                    <div class="col-4 d-flex justify-content-center align-items-center">
+                                        <!-- Action Buttons -->
+                                        @* Increase Quantity button should be invisible if not enough stock*@
+                                        @if (item.Quantity < item.Book.Stock.Quantity)
+                                        {
+                                            <a class="btn btn-outline-info btn-sm" href="/Cart/AddItem?bookId=@item.BookId&&redirect=1">+</a>
+                                        }
+                                        else
+                                        {
+                                            <span style="border: 1px solid;padding: 5px 5px;color: red;border-radius: 5px;margin-right:4px">Out of stock</span>
+                                        }
+
+                                        <strong class="p-1">@item.Quantity</strong>
+
+                                        <!-- Decrement button -->
+                                        <a class="btn btn-outline-danger btn-sm" href="/cart/removeitem?bookid=@item.BookId">-</a>
+                                    </div>
+                                    <div class="col-2 d-flex justify-content-center align-items-center">
+                                        <p>Total: @(@item.Book.Price * item.Quantity)</p>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <h5 class="text-center text-muted">Cart is empty</h5>
+        }
+    </div>
+    <div class="col-4">
+
+        
+            <div class="row discount">
+                <div>
+                    <h5 class="align-content-end">Discount</h5>
+                    <div class="form-group row">
+                        <div class="col-7"><input id="textContent" type="text" class="form-control" placeholder="Enter discount code"></div>
+                        <div class="col-3"><button class="btn btn-primary btn-block" onclick="alertTest()">Apply</button></div>
+                        <div id="couponContainer"  class="mt-3">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+
+
+        <div class="checkout-card">
+            <h2>Order Summary</h2>
+            <div class="subtotal">
+                <p>Subtotal:</p>
+                <span>$40.00</span>
+            </div>
+
+            <div class="tax">
+                <p>Tax (10%):</p>
+                <span>$4.00</span>
+            </div>
+
+            <div class="total">
+                <p>Total:</p>
+                <span>$@Model?.CartDetails?.Select(item => item.Book.Price * item.Quantity).Sum()</span>
+            </div>
+
+            <a class="checkout-btn" href="/Cart/Checkout">Checkout</a>
+        </div>
+    </div>
 </div>
+
+<script>
+    function alertTest(){
+        let couponContainer = document.getElementById("couponContainer");
+        let textContent = document.getElementById("textContent").value;
+        couponContainer.appendChild(createBadge(textContent));
+    }
+
+    function createBadge(textContent){
+        
+        let badge = document.createElement("span");
+        badge.classList.add("badge");
+        badge.textContent = textContent;
+        let closeIcon = document.createElement("span");
+        closeIcon.classList.add("close-icon");
+        closeIcon.textContent = "X";
+        closeIcon.onclick = function () {
+            removeBadge(badge);
+        };
+        badge.appendChild(closeIcon);
+        return badge;
+    }
+
+    function removeBadge(badge) {
+        badge.remove();
+    }
+</script>
+
+
 

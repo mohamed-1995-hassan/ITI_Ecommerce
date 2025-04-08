@@ -20,5 +20,6 @@ namespace ITI_Ecommerce.Data
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<WishList> WishLists { get; set; }
+        public DbSet<Coupon> Coupons { get; set; }
     }
 }

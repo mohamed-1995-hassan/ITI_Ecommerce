@@ -28,8 +28,8 @@ namespace ITI_Ecommerce.Models
         [MaxLength(30)]
         public string? PaymentMethod { get; set; }
         public bool IsPaid { get; set; }
-
         public List<OrderDetail> OrderDetails { get; set; }
+        public List<OrderCoupon> OrderCoupons { get; set; }
 
     }
 }

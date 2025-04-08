@@ -118,19 +118,15 @@
                 window.location.href = '/identity/Account/Login'
             }
             try{
-                
-                var heartCount = document.getElementById("heartCount");
                 var response = await fetch(`/WishList/ManageWishList?bookId=${bookId}`);
                 if (response.status == 200) {
                     var result = await response.json();
                     console.log(result);
                     if(result == true){
-                        heartCount.innerHTML = Number(heartCount.innerHTML) + 1;
                         $(this).html(`<i class="bi bi-heart-fill" style="font-size: 30px;color:red"></i>`)
 
                     }
                     else{
-                        heartCount.innerHTML = Number(heartCount.innerHTML) - 1;
                         $(this).html(`<span id="heartIcon" class="badge text-bg-info" style="position: absolute; top: 25%; right: 15%; transform: translate(50%, -50%);">+</span><i class="bi bi-heart" style="font-size: 30px;color:red"></i>`)
                     }
                     window.location.href = "#heartCount"

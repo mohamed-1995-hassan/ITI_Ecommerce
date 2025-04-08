@@ -39,18 +39,26 @@ namespace ITI_Ecommerce.Controllers
             return Ok(count);
         }
 
-        public IActionResult Checkout()
+        public async Task<IActionResult> Checkout()
         {
-            return View();
+            var card = await _cartRepository.GetUserCart();
+            var checkoutDisplay = new CheckoutDisplayModel
+            {
+                CartDetails = card.CartDetails
+            };
+            return View(checkoutDisplay);
         }
         [HttpPost]
-        public async Task<IActionResult> Checkout(CheckoutModel model)
+        public async Task<IActionResult> Checkout(CheckoutDisplayModel model)
         {
+            ModelState.Remove("CartDetails");
             if (!ModelState.IsValid)
             {
+                var card = await _cartRepository.GetUserCart();
+                model.CartDetails = card.CartDetails;
                 return View(model);
             }
-            bool isCheckedOut = await _cartRepository.DoCheckout(model);
+            bool isCheckedOut = await _cartRepository.DoCheckout(model.CheckoutModel);
             if (!isCheckedOut)
                 return RedirectToAction(nameof(OrderFailure));
             return RedirectToAction(nameof(OrderSuccess));

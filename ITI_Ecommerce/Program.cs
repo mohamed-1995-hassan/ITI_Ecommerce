@@ -27,6 +27,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IWishListRepository, WishListRepository>();
+builder.Services.AddScoped<ICouponRepository, CouponRepository>();
 
 var app = builder.Build();
 
